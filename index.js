@@ -1,7 +1,7 @@
 const express = require('express')
 
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors')
 const app = express();
 const port = process.env.PORT || 5000;
@@ -35,6 +35,7 @@ async function run() {
     await client.connect();
 
     const userCollection = client.db("TechnologyDB").collection('Technology');
+    const userStroge = client.db("Stroge").collection('Technology');
      
     // post
      app.post("/tech",async(req,res) => {
@@ -50,9 +51,31 @@ async function run() {
         const cursor = userCollection.find();
         const result =await cursor.toArray();
         res.send(result)
-     
-     
     } )
+
+    app.get('/tech/:id', async(req,res) => {
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)}
+      const result =await userCollection.findOne(query);
+      res.send(result)
+    })
+
+
+    // Card DB
+    app.post("/card",async(req,res) => {
+      const NewUser = req.body;
+      console.log(NewUser)
+      const result = await userStroge.insertOne(NewUser);
+      res.send(result);    
+   })
+
+   app.get('/card',async(req,res) => {
+
+    const cursor = userStroge.find();
+    const result =await cursor.toArray();
+    res.send(result)
+} )
+
        
 
     // Send a ping to confirm a successful connection
